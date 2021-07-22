@@ -1,0 +1,17 @@
+server:
+  port: 8761
+spring:
+  application:
+    name: registry
+security:
+  basic:
+    enabled: true
+  user:
+    name: mooc
+    password: 111111
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+    service-url:
+      defaultZone: http://mooc:111111@localhost:${server.port}/eureka/

@@ -1,0 +1,9 @@
+server:
+  port: 8888
+spring:
+  application:
+    name: proxy
+eureka:
+  client:
+    service-url:
+      defaultZone: http://mooc:111111@localhost:8761/eureka

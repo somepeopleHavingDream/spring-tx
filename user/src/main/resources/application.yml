@@ -1,0 +1,18 @@
+server:
+  port: 8081
+spring:
+  application:
+    name: user
+  datasource:
+    url: jdbc:mysql://localhost:3306/mooc_user
+    username: user1
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://mooc:111111@localhost:8761/eureka/
