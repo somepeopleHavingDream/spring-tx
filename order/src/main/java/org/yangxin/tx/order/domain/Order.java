@@ -13,7 +13,7 @@ import java.time.ZonedDateTime;
  * @author yangxin
  * 2021/7/15 下午8:48
  */
-@Entity(name = "customer_order")
+@Entity(name = "t_customer_order")
 @Getter
 @Setter
 @ToString

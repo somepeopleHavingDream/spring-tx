@@ -27,7 +27,7 @@ public class OrderResource implements OrderCompositeService {
     private final OrderRepository orderRepository;
     private final JmsTemplate jmsTemplate;
 
-    private TimeBasedGenerator uuidGenerator = Generators.timeBasedGenerator();
+    private final TimeBasedGenerator uuidGenerator = Generators.timeBasedGenerator();
 
     @Autowired
     public OrderResource(OrderRepository orderRepository, JmsTemplate jmsTemplate) {

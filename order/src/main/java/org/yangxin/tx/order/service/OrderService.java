@@ -36,32 +36,26 @@ public class OrderService {
 
     @Transactional(rollbackFor = Throwable.class)
     @JmsListener(destination = OrderConstant.QUEUE_ORDER_LOCKED, containerFactory = "msgFactory")
-    public void handle(OrderDTO msg) {
-        if (log.isInfoEnabled()) {
-            log.info("Get new order to create: [{}]", msg);
-        }
+    public void handle(OrderDTO orderDTO) {
+        log.info("Get new order to create: [{}]", orderDTO);
 
         // 通过保存到数据库，来使用uuid处理重复消息
-        if (orderRepository.findOneByUuid(msg.getUuid()) != null) {
-            if (log.isInfoEnabled()) {
-                log.info("Msg already processed: [{}]", msg);
-            }
+        if (orderRepository.findOneByUuid(orderDTO.getUuid()) != null) {
+            log.info("Msg already processed: [{}]", orderDTO);
         } else {
-            Order order = Order.newOrder(msg);
+            Order order = Order.newOrder(orderDTO);
             orderRepository.save(order);
-            msg.setId(order.getId());
+            orderDTO.setId(order.getId());
         }
 
-        msg.setStatus(OrderConstant.STATUS_NEW);
-        jmsTemplate.convertAndSend(OrderConstant.QUEUE_ORDER_PAY, msg);
+        orderDTO.setStatus(OrderConstant.STATUS_NEW);
+        jmsTemplate.convertAndSend(OrderConstant.QUEUE_ORDER_PAY, orderDTO);
     }
 
     @Transactional(rollbackFor = Throwable.class)
     @JmsListener(destination = OrderConstant.QUEUE_ORDER_FINISH, containerFactory = "msgFactory")
     public void handleFinish(OrderDTO msg) {
-        if (log.isInfoEnabled()) {
-            log.info("Get finished order: [{}]", msg);
-        }
+        log.info("Get finished order: [{}]", msg);
 
         Order order = orderRepository.findOne(msg.getId());
         order.setStatus(OrderConstant.STATUS_FINISH);
@@ -71,19 +65,20 @@ public class OrderService {
 
     @Transactional(rollbackFor = Throwable.class)
     @JmsListener(destination = OrderConstant.QUEUE_ORDER_FAIL, containerFactory = "msgFactory")
-    public void handleFailed(OrderDTO msg) {
+    public void handleFailed(OrderDTO orderDTO) {
         if (log.isInfoEnabled()) {
-            log.info("Get failed order: [{}]", msg);
+            log.info("Get failed order: [{}]", orderDTO);
         }
 
         Order order;
-        if (msg.getId() == null) {
-            order = Order.newOrder(msg);
+        if (orderDTO.getId() == null) {
+            // 创建订单，用于失败
+            order = Order.newOrder(orderDTO);
             // 锁票失败
             order.setReason(OrderConstant.STATUS_TICKET_LOCK_FAIL);
         } else {
-            order = orderRepository.findOne(msg.getId());
-            if (Objects.equals(msg.getStatus(), OrderConstant.STATUS_NOT_ENOUGH_DEPOSIT)) {
+            order = orderRepository.findOne(orderDTO.getId());
+            if (Objects.equals(orderDTO.getStatus(), OrderConstant.STATUS_NOT_ENOUGH_DEPOSIT)) {
                 order.setReason(OrderConstant.STATUS_NOT_ENOUGH_DEPOSIT);
             }
         }

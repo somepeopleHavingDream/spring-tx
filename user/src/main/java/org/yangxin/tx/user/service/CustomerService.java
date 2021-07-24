@@ -18,6 +18,7 @@ import org.yangxin.tx.user.domain.PayInfo;
  * @author yangxin
  * 2021/7/20 下午10:26
  */
+@SuppressWarnings("AlibabaRemoveCommentedCode")
 @Service
 @Slf4j
 public class CustomerService {

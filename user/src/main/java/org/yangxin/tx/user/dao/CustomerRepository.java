@@ -9,7 +9,7 @@ import org.yangxin.tx.user.domain.Customer;
  * @author yangxin
  * 2021/7/20 下午10:18
  */
-@SuppressWarnings({"unused", "AlibabaAbstractMethodOrInterfaceMethodMustUseJavadoc"})
+@SuppressWarnings({"unused", "AlibabaAbstractMethodOrInterfaceMethodMustUseJavadoc", "UnusedReturnValue"})
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
     Customer findOneByUsername(String username);

@@ -19,6 +19,7 @@ import javax.jms.ConnectionFactory;
  * @author yangxin
  * 2021/7/19 下午9:21
  */
+@SuppressWarnings("AlibabaRemoveCommentedCode")
 @Configuration
 public class JmsConfig {
 
