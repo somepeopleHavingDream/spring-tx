@@ -58,6 +58,26 @@ public class TicketService {
     }
 
     @Transactional(rollbackFor = Throwable.class)
+    @JmsListener(destination = OrderConstant.QUEUE_TICKET_ERROR, containerFactory = "msgFactory")
+    public void handleError(OrderDTO orderDTO) {
+        log.info("Get order error for ticket unlock: [{}]", orderDTO);
+
+        // 撤销票的转移
+        int count = ticketRepository.unMoveTicket(orderDTO.getCustomerId(), orderDTO.getTicketNum());
+        if (count == 0) {
+            log.info("Ticket already unlocked: [{}]", orderDTO);
+        }
+
+        // 撤销锁票
+        count = ticketRepository.unLockTicket(orderDTO.getCustomerId(), orderDTO.getTicketNum());
+        if (count == 0) {
+            log.info("Ticket already unmoved, or not moved: [{}]", orderDTO);
+        }
+
+        jmsTemplate.convertAndSend(OrderConstant.QUEUE_ORDER_FAIL, orderDTO);
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
     public Ticket lockTicket(OrderDTO orderDTO) {
         Ticket ticket = ticketRepository.findOneByTicketNum(orderDTO.getTicketNum());
         if (ticket == null) {
@@ -89,4 +109,6 @@ public class TicketService {
 
         return updateCount;
     }
+
+
 }
